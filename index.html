@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <title>Countdown</title>
@@ -10,63 +9,102 @@
             align-items: center;
             gap: 10px;
         }
-
         #language_button {
             font-size: 12px;
             padding: 4px 8px;
         }
     </style>
 </head>
-
 <body>
     <div class="header">
         <h1 id="title">Mina's Countdown Website</h1>
-
         <button id="language_button">切換為中文</button>
     </div>
 
     <p id="word">Please choose a date</p>
     <input type="date" id="dateInput">
     <button id="Start_button">Start Countdown</button>
+    <p id="result"></p>
 
     <script>
         let lang = "en";
 
-        document.querySelector("#language_button").addEventListener("click", function () {
-            if (lang === "zh") {
-                lang = "en";
-            } else {
-                lang = "zh";
+        const text = {
+            en: {
+                title: "Mina's Countdown Website",
+                button: "切換為中文",
+                word: "Please choose a date",
+                start: "Start Countdown",
+                noDate: "Please select a date",
+                result: (days) => `There are still ${days} days until that date.`,
+                passed: "That date has already passed"
+            },
+            zh: {
+                title: "Mina的倒數網站",
+                button: "Switch to English",
+                word: "請選擇日期",
+                start: "開始倒數",
+                noDate: "請選擇一個日期",
+                result: (days) => `距離該日期還有 ${days} 天`,
+                passed: "這個日期已經過了"
             }
-            document.querySelector("#title").textContent =
-                (lang === "zh") ? "Mina的倒數網站" : "Mina's Countdown Website";
-            document.querySelector("#language_button").textContent =
-                (lang === "zh") ? "Switch to English" : "切換為中文";
-            document.querySelector("#word").textContent =
-                (lang === "zh") ? "請選擇日期" : "Please choose a date";
-            document.querySelector("#Start_botton").textContent =
-                (lang === "zh") ? "開始倒數" : "Start Countdown";
+        };
+
+        function updateText() {
+            document.querySelector("#title").textContent = text[lang].title;
+            document.querySelector("#language_button").textContent = text[lang].button;
+            document.querySelector("#word").textContent = text[lang].word;
+            document.querySelector("#Start_button").textContent = text[lang].start;
+        }
+
+        let lastResult = "";
+        let lastDays = 0;
+
+        function updateResult() {
+            const resultElement = document.querySelector("#result");
+            if (lastResult === "noDate") {
+                resultElement.textContent = text[lang].noDate;
+            } else if (lastResult === "passed") {
+                resultElement.textContent = text[lang].passed;
+            } else if (lastResult === "countdown") {
+                resultElement.textContent = text[lang].result(lastDays);
+            }
+        }
+
+        document.querySelector("#language_button").addEventListener("click", function () {
+            lang = (lang === "en") ? "zh" : "en";
+            updateText();
+            updateResult();
         });
+
         document.querySelector("#Start_button").addEventListener("click", function () {
             let inputDate = document.querySelector("#dateInput").value;
+            let resultElement = document.querySelector("#result");
 
-            let today = new Date();
+            if (!inputDate) {
+                lastResult = "noDate";
+                resultElement.textContent = text[lang].noDate;
+                resultElement.style.color = "red";
+                return;
+            }
+
             let target = new Date(inputDate);
-
+            let today = new Date();
             let diffTime = target - today;
             let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-            if (lang === "zh") {
-                document.querySelector("#result").textContent =
-                    "距離該日期還有 " + diffDays + " 天";
-            } else {
-                document.querySelector("#result").textContent =
-                    "There are still " + diffDays + " days until that date";
+            resultElement.style.color = "black";
+
+            if (diffDays < 0) {
+                lastResult = "passed";
+                resultElement.textContent = text[lang].passed;
+                return;
             }
+
+            lastResult = "countdown";
+            lastDays = diffDays;
+            resultElement.textContent = text[lang].result(diffDays);
         });
     </script>
-
-    <p id="result"></p>
 </body>
-
 </html>
