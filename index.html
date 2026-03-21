@@ -4,15 +4,28 @@
 <head>
     <meta charset="UTF-8">
     <title>Countdown</title>
+    <style>
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #language_button {
+            font-size: 12px;
+            padding: 4px 8px;
+        }
+    </style>
 </head>
 
 <body>
     <div class="header">
-        <h1>Mina's Countdown Website</h1>
+        <h1 id="title">Mina's Countdown Website</h1>
+
         <button id="language_button">切換為中文</button>
     </div>
 
-    <p>Please choose a date</p>
+    <p id="word">Please choose a date</p>
     <input type="date" id="dateInput">
     <button id="Start_button">Start Countdown</button>
 
@@ -25,8 +38,14 @@
             } else {
                 lang = "zh";
             }
+            document.querySelector("#title").textContent =
+                (lang === "zh") ? "Mina的倒數網站" : "Mina's Countdown Website";
             document.querySelector("#language_button").textContent =
                 (lang === "zh") ? "Switch to English" : "切換為中文";
+            document.querySelector("#word").textContent =
+                (lang === "zh") ? "請選擇日期" : "Please choose a date";
+            document.querySelector("#Start_botton").textContent =
+                (lang === "zh") ? "開始倒數" : "Start Countdown";
         });
         document.querySelector("#Start_button").addEventListener("click", function () {
             let inputDate = document.querySelector("#dateInput").value;
