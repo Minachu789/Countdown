@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Countdown</title>
+</head>
+
+<body>
+    <div class="header">
+        <h1>Mina's Countdown Website</h1>
+        <button id="language_button">切換為中文</button>
+    </div>
+
+    <p>Please choose a date</p>
+    <input type="date" id="dateInput">
+    <button id="Start_button">Start Countdown</button>
+
+    <script>
+        let lang = "en";
+
+        document.querySelector("#language_button").addEventListener("click", function () {
+            if (lang === "zh") {
+                lang = "en";
+            } else {
+                lang = "zh";
+            }
+            document.querySelector("#language_button").textContent =
+                (lang === "zh") ? "Switch to English" : "切換為中文";
+        });
+        document.querySelector("#Start_button").addEventListener("click", function () {
+            let inputDate = document.querySelector("#dateInput").value;
+
+            let today = new Date();
+            let target = new Date(inputDate);
+
+            let diffTime = target - today;
+            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (lang === "zh") {
+                document.querySelector("#result").textContent =
+                    "距離該日期還有 " + diffDays + " 天";
+            } else {
+                document.querySelector("#result").textContent =
+                    "There are still " + diffDays + " days until that date";
+            }
+        });
+    </script>
+
+    <p id="result"></p>
+</body>
+
+</html>
