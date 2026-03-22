@@ -4,69 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Countdown</title>
-    <style>
-        .header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        #language_button {
-            font-size: 12px;
-            padding: 4px 8px;
-        }
-    </style>
+    <link rel="stylesheet" href="Style.css">
 </head>
 
 <body>
     <div class="header">
         <h1 id="title">Mina's Countdown Website</h1>
-
         <button id="language_button">切換為中文</button>
     </div>
 
     <p id="word">Please choose a date</p>
     <input type="date" id="dateInput">
     <button id="Start_button">Start Countdown</button>
-
-    <script>
-        let lang = "en";
-
-        document.querySelector("#language_button").addEventListener("click", function () {
-            if (lang === "zh") {
-                lang = "en";
-            } else {
-                lang = "zh";
-            }
-            document.querySelector("#title").textContent =
-                (lang === "zh") ? "Mina的倒數網站" : "Mina's Countdown Website";
-            document.querySelector("#language_button").textContent =
-                (lang === "zh") ? "Switch to English" : "切換為中文";
-            document.querySelector("#word").textContent =
-                (lang === "zh") ? "請選擇日期" : "Please choose a date";
-            document.querySelector("#Start_botton").textContent =
-                (lang === "zh") ? "開始倒數" : "Start Countdown";
-        });
-        document.querySelector("#Start_button").addEventListener("click", function () {
-            let inputDate = document.querySelector("#dateInput").value;
-
-            let today = new Date();
-            let target = new Date(inputDate);
-
-            let diffTime = target - today;
-            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            if (lang === "zh") {
-                document.querySelector("#result").textContent =
-                    "距離該日期還有 " + diffDays + " 天";
-            } else {
-                document.querySelector("#result").textContent =
-                    "There are still " + diffDays + " days until that date";
-            }
-        });
-    </script>
-
     <p id="result"></p>
+
+    <script src="script.js" defer></script>
 </body>
 
 </html>

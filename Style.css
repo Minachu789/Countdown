@@ -1,0 +1,15 @@
+.header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#language_button {
+    font-size: 12px;
+    padding: 4px 8px;
+    background-color: pink;
+}
+
+body {
+    background-color: rgb(255, 255, 255);
+}
