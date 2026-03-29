@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Countdown</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="Style.css">
 </head>
 
@@ -13,9 +14,14 @@
         <button id="language_button">切換為中文</button>
     </div>
 
+    <p id="eventLabel">Event Name</p>
+    <input type="text" id="eventName">
+
     <p id="word">Please choose a date</p>
-    <input type="date" id="dateInput">
-    <button id="Start_button">Start Countdown</button>
+    <input type="date" id="dateInput" max="9999-12-31">
+    <button id="Start_button">Add Countdown</button>
+    <div id="list"></div>
+
     <p id="result"></p>
 
     <script src="script.js" defer></script>

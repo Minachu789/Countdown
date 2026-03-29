@@ -10,6 +10,12 @@
     background-color: pink;
 }
 
+#list div {
+    border: 1px solid #eee;
+    padding: 5px;
+    margin-top: 20px;
+}
+
 body {
     background-color: rgb(255, 255, 255);
 }
