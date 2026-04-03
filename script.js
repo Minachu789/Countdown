@@ -31,8 +31,11 @@ const translate = {
         noName: "Please enter event name",
         noDN: "Please enter event name and select a date",
         event: "Event Name",
-        result: (days, date) => `There are still ${days} days until ${date}`,
-        passed: "The date has already passed."
+        passed: "The date has already passed.",
+        day: "Days",
+        minute:"Minutes",
+        hour:"Hours",
+        second:"Seconds"
     },
     zh: {
         title: "Mina的倒數網站",
@@ -43,8 +46,11 @@ const translate = {
         noName: "請輸入事件名稱",
         noDN: "請輸入事件名稱和選擇一個日期",
         event: "事件名稱",
-        result: (days, date) => `距離 ${date} 還有 ${days} 天`,
-        passed: "這個日期已經過了"
+        passed: "這個日期已經過了",
+        day: "天",
+        minute: "分",
+        hour:"小時",
+        second:"秒"
     }
 };
 
@@ -96,20 +102,16 @@ box.AddCountdownButton.addEventListener("click", function () {
     } else if (!eventName) {
         state.lastResult = "noName";
     } else {
-        let diffDays = calculateDays(inputDate);
+        let check = calculateDays(inputDate);
 
-        if (diffDays < 0) {
+        if (check.days < 0) {
             state.lastResult = "passed";
         } else {
             state.items.push({ name: eventName, date: inputDate });
-            state.lastDate = inputDate;
-            state.lastDays = diffDays;
-            state.lastResult = "countdown";
-
+            state.lastResult = "";
             save();
             box.eventName.value = "";
             box.input.value = "";
-            state.lastResult = "";
         }
     }
 
@@ -119,42 +121,63 @@ box.AddCountdownButton.addEventListener("click", function () {
 
 function calculateDays(date) {
     let target = new Date(date);
+    target.setHours(0, 0, 0, 0);
     let today = new Date();
     let diffTime = target - today;
 
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    // Math.floor 無條件捨去
+    let days = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    let hours = Math.floor(diffTime / (1000 * 60 * 60) % 24);
+    let minutes = Math.floor(diffTime / (1000 * 60) % 60);
+    let seconds = Math.floor(diffTime / 1000 % 60);
+
+    return { days, hours, minutes, seconds };
 }
 
 function renderList() {
     box.list.innerHTML = "";
     state.items.forEach((item, index) => {
-        let days = calculateDays(item.date);
-        let text = (days < 0) ? translate[state.language].passed : translate[state.language].result(days, item.date);
+        const time = calculateDays(item.date);
 
         let row = document.createElement("div");
-        row.style.display = "flex";
-        row.style.alignItems = "center";
-        row.style.padding = "10px 15px";
-        row.style.gap = "15px";
+        row.classList.add("item_row");
 
         let del = document.createElement("button");
         del.innerHTML = '<i class="fas fa-trash"></i>';
-        del.style.color = "#ff4d4d";
-        del.style.background = "transparent";
-        del.style.border = "none";
-        del.style.cursor = "pointer";
-        del.style.fontSize = "1.1rem";
+        del.classList.add("delete_button");
         del.addEventListener("click", () => {
             state.items.splice(index, 1);
             save();
             renderList();
         });
 
-        let content = document.createElement("p");
-        content.innerHTML = `<strong>${item.name}</strong> - ${text}`;
-        content.style.margin = "0";
-        content.style.flex = "1";
+        let content = document.createElement("div");
+        // content.innerHTML = `<strong>${item.name}</strong> - ${text}`;
+        content.className = "item_content";
 
+        let eventName = document.createElement("p");
+        eventName.className = "item_eventName";
+        eventName.textContent = item.name;
+
+        let timeElement = document.createElement("div");
+        timeElement.className = "timer_display";
+
+        if (time.days < 0) {
+            timeElement.textContent = translate[state.language].passed;
+        } else {
+            //格式化數字
+            const format = (num) => String(Math.max(0, num)).padStart(2, '0');
+
+            timeElement.innerHTML = `
+            <div class="time-unit"><span>${format(time.days)}</span><small>${translate[state.language].day}</small></div>
+            <div class="time-unit"><span>${format(time.hours)}</span><small>${translate[state.language].hour}</small></div>
+            <div class="time-unit"><span>${format(time.minutes)}</span><small>${translate[state.language].minute}</small></div>
+            <div class="time-unit"><span>${format(time.seconds)}</span><small>${translate[state.language].second}</small></div>
+            `;
+        }
+
+        content.appendChild(eventName);
+        content.appendChild(timeElement);
         row.appendChild(del);
         row.appendChild(content);
 
@@ -162,4 +185,7 @@ function renderList() {
     });
 }
 changeLanguage();
-renderList();
+setInterval(renderList, 1000);
+
+//TODO week 15
+//每個倒數可以自己選顏色、提供多種背景給大家選

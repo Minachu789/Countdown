@@ -10,10 +10,71 @@
     background-color: pink;
 }
 
-#list div {
+.delete_button {
+    color: #ff4d4d;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-Size: 1.1rem;
+}
+
+.item_eventName {
+    margin: 0 0 10px 0;
+    font-size: 1.5rem;
+    color: #333;
+    display: block;
+}
+
+.item_row {
+    display: flex;
+    align-items: center;
+    padding: 6px 10px;
+    gap: 10px;
+    border-bottom: 1px solid #ddd;
+    margin-top: 10px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    width: fit-content;
+}
+
+.countdown-item {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding: 15px;
+    gap: 15px;
+}
+
+.item_content {
+    margin: 0;
+    flex: 1;
+}
+
+.timer_display {
+    display: flex;
+    background-color: #ffffff;
     border: 1px solid #eee;
+    border-radius: 4px;
     padding: 5px;
-    margin-top: 20px;
+}
+
+.time-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 50px;
+}
+
+.time-unit span {
+    font-size: 1.2rem;
+    font-weight: bold;
+    font-family: monospace;
+}
+
+.time-unit small {
+    font-size: 0.6rem;
+    color: #888;
+    margin-top: 2px;
 }
 
 body {
