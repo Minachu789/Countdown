@@ -187,5 +187,5 @@ function renderList() {
 changeLanguage();
 setInterval(renderList, 1000);
 
-//TODO week 15
-//每個倒數可以自己選顏色、提供多種背景給大家選
+//TODO week 15 
+//每個倒數可以自己選顏色、提供多種背景給大家選、倒數太多不要一直往下，看要不要放到第二行
