@@ -14,15 +14,35 @@
         <button id="language_button">切換為中文</button>
     </div>
 
-    <p id="eventLabel">Event Name</p>
-    <input type="text" id="eventName">
+    <div class="input-container">
+        <div class="input-group">
+            <p id="eventLabel">Event Name</p>
+            <input type="text" id="eventName">
+        </div>
 
-    <p id="word">Please choose a date</p>
-    <input type="date" id="dateInput" max="9999-12-31">
-    <button id="Start_button">Add Countdown</button>
+        <div class="input-group">
+            <p id="word">Please choose a date</p>
+            <input type="date" id="dateInput" max="9999-12-31">
+        </div>
+
+        <div class="input-group">
+            <p>BG Color</p>
+            <input type="color" id="bgColorPicker" value="#ffffff">
+        </div>
+
+        <div class="input-group">
+            <p>Line Color</p>
+            <input type="color" id="lineColorPicker" value="#ffb6c1">
+        </div>
+
+
+
+        <button id="Start_button">Add Countdown</button>
+
+        <p id="result"></p>
+    </div>
+
     <div id="list"></div>
-
-    <p id="result"></p>
 
     <script src="script.js" defer></script>
 </body>
