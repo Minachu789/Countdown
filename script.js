@@ -20,7 +20,9 @@ const box = {
     result: document.querySelector("#result"),
     list: document.querySelector("#list"),
     lineColorPicker: document.querySelector("#lineColorPicker"),
-    bgColorPicker: document.querySelector("#bgColorPicker")
+    bgColorPicker: document.querySelector("#bgColorPicker"),
+    lineColorLabel: document.querySelector("#lineColorLabel"),
+    bgColorLabel: document.querySelector("#bgColorLabel")
 }
 
 const translate = {
@@ -37,7 +39,9 @@ const translate = {
         day: "Days",
         minute: "Minutes",
         hour: "Hours",
-        second: "Seconds"
+        second: "Seconds",
+        bgColor: "Background color",
+        lineColor: "Line color"
     },
     zh: {
         title: "Mina的倒數網站",
@@ -52,7 +56,9 @@ const translate = {
         day: "天",
         minute: "分",
         hour: "小時",
-        second: "秒"
+        second: "秒",
+        bgColor: "背景顏色",
+        lineColor: "線條顏色"
     }
 };
 
@@ -67,52 +73,15 @@ function changeLanguage() {
     box.word.textContent = translate[state.language].word;
     box.eventLabel.textContent = translate[state.language].event;
     box.AddCountdownButton.textContent = translate[state.language].start;
+    box.bgColorLabel.textContent = translate[state.language].bgColor;
+    box.lineColorLabel.textContent = translate[state.language].lineColor;
+
+    if (state.lastResult) {
+        box.result.textContent = translate[state.language][state.lastResult];
+    }
+
     renderList();
 }
-
-box.languageButton.addEventListener("click", function () {
-    state.language = (state.language === "en") ? "zh" : "en";
-    save();
-    changeLanguage();
-});
-
-box.AddCountdownButton.addEventListener("click", function () {
-    const inputDate = box.input.value;
-    const eventName = box.eventName.value.trim();
-
-    console.log("Button Clicked!", { inputDate, eventName });
-
-    const lineColor = box.lineColorPicker.value;
-    const bgColor = box.bgColorPicker.value;
-
-    if (!inputDate || !eventName) {
-        box.result.style.color = "red";
-        box.result.textContent = translate[state.language].noDN;
-        return;
-    }
-
-    const check = calculateDays(inputDate);
-    if (check.totalDiff < 0) {
-        box.result.style.color = "red";
-        box.result.textContent = translate[state.language].passed;
-        return;
-    }
-
-    state.items.push({
-        name: eventName,
-        date: inputDate,
-        lineColor: lineColor,
-        bgColor: bgColor
-    });
-
-    save();
-    renderList();
-
-    // 清空輸入框
-    box.eventName.value = "";
-    box.input.value = "";
-    box.result.textContent = "";
-});
 
 function calculateDays(date) {
     const target = new Date(date);
@@ -127,6 +96,31 @@ function calculateDays(date) {
         minutes: Math.floor((diffTime / (1000 * 60)) % 60),
         seconds: Math.floor((diffTime / 1000) % 60)
     };
+}
+
+function calculatePercent(startDate, endDate) {
+    let start = new Date(startDate);
+    let end = new Date(endDate);
+    let now = new Date();
+
+    if (now >= end) {
+        return 100;
+    }
+
+    if (now <= start) {
+        return 0;
+    }
+
+    let total = end - start;
+    let left = end - now;
+    let percent = left / total * 100;
+    return percent.toFixed(2);
+}
+
+function animateResult() {
+    box.result.classList.add("animate");
+
+    setTimeout(() => { box.result.classList.remove("animate") }, 300);
 }
 
 function renderList() {
@@ -157,6 +151,17 @@ function renderList() {
         const timeElement = document.createElement("div");
         timeElement.className = "timer_display";
 
+        const progress = document.createElement("div");
+        progress.className = "percent-container";
+
+        const bar = document.createElement("div");
+        bar.className = "percent-bar";
+
+        let percent = calculatePercent(item.start, item.date);
+        bar.style.width = percent + "%";
+        bar.style.backgroundColor = item.lineColor;
+        bar.style.backgroundImage = "none";
+
         if (time.totalDiff < 0) {
             timeElement.textContent = translate[state.language].passed;
         } else {
@@ -168,7 +173,7 @@ function renderList() {
                 <div class="time-unit"><span>${format(time.seconds)}</span><small>${translate[state.language].second}</small></div>
             `;
         }
-        
+
         const bgColor = item.bgColor || "#ffffff";
         const hex = bgColor.replace('#', '');
         const r = parseInt(hex.substring(0, 2), 16) || 255;
@@ -183,9 +188,71 @@ function renderList() {
         content.appendChild(timeElement);
         row.appendChild(del);
         row.appendChild(content);
+        row.appendChild(progress);
+        progress.appendChild(bar);
         box.list.appendChild(row);
     });
 }
 
+box.languageButton.addEventListener("click", function () {
+    state.language = (state.language === "en") ? "zh" : "en";
+    save();
+    changeLanguage();
+});
+
+box.AddCountdownButton.addEventListener("click", function () {
+    const inputDate = box.input.value;
+    const eventName = box.eventName.value.trim();
+
+    const lineColor = box.lineColorPicker.value;
+    const bgColor = box.bgColorPicker.value;
+
+    if (!inputDate && !eventName) {
+        state.lastResult = "noDN";
+        box.result.style.color = "red";
+        box.result.textContent = translate[state.language].noDN;
+        return;
+    }
+
+    if (!inputDate) {
+        state.lastResult = "noDate";
+        box.result.style.color = "red";
+        box.result.textContent = translate[state.language].noDate;
+        return;
+    }
+
+    if (!eventName) {
+        state.lastResult = "noName";
+        box.result.style.color = "red";
+        box.result.textContent = translate[state.language].noName;
+        return;
+    }
+
+    const check = calculateDays(inputDate);
+    if (check.totalDiff < 0) {
+        state.lastResult = "passed";
+        box.result.style.color = "red";
+        box.result.textContent = translate[state.language].passed;
+        return;
+    }
+
+    state.items.push({
+        name: eventName,
+        date: inputDate,
+        lineColor: lineColor,
+        bgColor: bgColor,
+        start: new Date().toISOString()
+    });
+
+    save();
+    renderList();
+
+    // 清空輸入框
+    box.eventName.value = "";
+    box.input.value = "";
+    box.result.textContent = "";
+});
+
+animateResult();
 changeLanguage();
 setInterval(renderList, 1000);
