@@ -158,30 +158,30 @@ function renderList() {
             const eventDisplay = document.createElement("p");
             eventDisplay.className = "item_eventName";
             eventDisplay.textContent = item.name;
+            eventDisplay.style.borderBottomColor = item.lineColor;
 
             const timeElement = document.createElement("div");
             timeElement.className = "timer_display";
             timeElement.innerHTML = `
-                <div class="time-unit">
-                    <div class="tiles-wrapper">${formatToTiles()}${formatToTiles()}</div>
-                    <small>${translate[state.language].day}</small>
-                </div>
-                <div class="time-unit">
-                    <div class="tiles-wrapper">${formatToTiles()}${formatToTiles()}</div>
-                    <small>${translate[state.language].hour}</small>
-                </div>
-                <div class="time-unit">
-                    <div class="tiles-wrapper">${formatToTiles()}${formatToTiles()}</div>
-                    <small>${translate[state.language].minute}</small>
-                </div>
-                <div class="time-unit">
-                    <div class="tiles-wrapper">${formatToTiles()}${formatToTiles()}</div>
-                    <small>${translate[state.language].second}</small>
-                </div>
+                <div class="time-unit"><div class="tiles-wrapper">${formatToTiles()}${formatToTiles()}</div><small>${translate[state.language].day}</small></div>
+                <div class="time-unit"><div class="tiles-wrapper">${formatToTiles()}${formatToTiles()}</div><small>${translate[state.language].hour}</small></div>
+                <div class="time-unit"><div class="tiles-wrapper">${formatToTiles()}${formatToTiles()}</div><small>${translate[state.language].minute}</small></div>
+                <div class="time-unit"><div class="tiles-wrapper">${formatToTiles()}${formatToTiles()}</div><small>${translate[state.language].second}</small></div>
             `;
 
+            const percentContainer = document.createElement("div");
+            percentContainer.className = "percent-container";
+
+            const percentBar = document.createElement("div");
+            percentBar.className = "percent-bar";
+
+            percentBar.style.backgroundImage = "none";
+            percentBar.style.backgroundColor = item.lineColor;
+
+            percentContainer.appendChild(percentBar);
             content.appendChild(eventDisplay);
             content.appendChild(timeElement);
+            content.appendChild(percentContainer);
             row.appendChild(del);
             row.appendChild(content);
             box.list.appendChild(row);
@@ -195,18 +195,22 @@ function renderList() {
 
         const time = calculateDays(item.date);
         const strips = row.querySelectorAll(".digit-strip");
-
-        const timeStr =
-            String(time.days).padStart(2, '0') +
-            String(time.hours).padStart(2, '0') +
-            String(time.minutes).padStart(2, '0') +
-            String(time.seconds).padStart(2, '0');
+        const timeStr = String(time.days).padStart(2, '0') + String(time.hours).padStart(2, '0') +
+            String(time.minutes).padStart(2, '0') + String(time.seconds).padStart(2, '0');
 
         for (let i = 0; i < 8; i++) {
             if (strips[i]) {
                 const digit = parseInt(timeStr[i]);
                 strips[i].style.transform = `translateY(-${digit * 40}px)`;
             }
+        }
+
+        const percentBar = row.querySelector(".percent-bar");
+        if (percentBar) {
+            const progress = calculatePercent(item.start, item.date);
+            percentBar.style.width = progress + "%";
+            percentBar.style.backgroundImage = "none";
+            percentBar.style.backgroundColor = item.lineColor;
         }
     });
 }
