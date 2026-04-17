@@ -85,9 +85,10 @@ function changeLanguage() {
 
 function calculateDays(date) {
     const target = new Date(date);
-    target.setHours(0, 0, 0, 0);
     const today = new Date();
     const diffTime = target - today;
+
+    if (diffTime <= 0) return { totalDiff: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
 
     return {
         totalDiff: diffTime,
@@ -96,6 +97,8 @@ function calculateDays(date) {
         minutes: Math.floor((diffTime / (1000 * 60)) % 60),
         seconds: Math.floor((diffTime / 1000) % 60)
     };
+
+
 }
 
 function calculatePercent(startDate, endDate) {
@@ -124,73 +127,87 @@ function animateResult() {
 }
 
 function renderList() {
-    box.list.innerHTML = "";
-    state.items.forEach((item, index) => {
-        const time = calculateDays(item.date);
-        const row = document.createElement("div");
-        row.classList.add("item_row");
-        row.style.backgroundColor = item.bgColor;
+    if (box.list.children.length !== state.items.length) {
+        box.list.innerHTML = "";
 
-        const del = document.createElement("button");
-        del.innerHTML = '<i class="fas fa-trash"></i>';
-        del.classList.add("delete_button");
-        del.addEventListener("click", () => {
-            state.items.splice(index, 1);
-            save();
-            renderList();
-        });
+        const formatToTiles = () => `
+            <div class="digit-tile">
+                <div class="digit-strip">
+                    <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
+                    <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>
+                </div>
+            </div>`;
 
-        const content = document.createElement("div");
-        content.className = "item_content";
+        state.items.forEach((item, index) => {
+            const row = document.createElement("div");
+            row.classList.add("item_row");
+            row.style.backgroundColor = item.bgColor;
 
-        const eventDisplay = document.createElement("p");
-        eventDisplay.className = "item_eventName";
-        eventDisplay.style.borderBottomColor = item.lineColor;
-        eventDisplay.textContent = item.name;
+            const del = document.createElement("button");
+            del.innerHTML = '<i class="fas fa-trash"></i>';
+            del.classList.add("delete_button");
+            del.addEventListener("click", () => {
+                state.items.splice(index, 1);
+                save();
+                renderList();
+            });
 
-        const timeElement = document.createElement("div");
-        timeElement.className = "timer_display";
+            const content = document.createElement("div");
+            content.className = "item_content";
 
-        const progress = document.createElement("div");
-        progress.className = "percent-container";
+            const eventDisplay = document.createElement("p");
+            eventDisplay.className = "item_eventName";
+            eventDisplay.textContent = item.name;
 
-        const bar = document.createElement("div");
-        bar.className = "percent-bar";
-
-        let percent = calculatePercent(item.start, item.date);
-        bar.style.width = percent + "%";
-        bar.style.backgroundColor = item.lineColor;
-        bar.style.backgroundImage = "none";
-
-        if (time.totalDiff < 0) {
-            timeElement.textContent = translate[state.language].passed;
-        } else {
-            const format = (num) => String(Math.max(0, num)).padStart(2, '0');
+            const timeElement = document.createElement("div");
+            timeElement.className = "timer_display";
             timeElement.innerHTML = `
-                <div class="time-unit"><span>${format(time.days)}</span><small>${translate[state.language].day}</small></div>
-                <div class="time-unit"><span>${format(time.hours)}</span><small>${translate[state.language].hour}</small></div>
-                <div class="time-unit"><span>${format(time.minutes)}</span><small>${translate[state.language].minute}</small></div>
-                <div class="time-unit"><span>${format(time.seconds)}</span><small>${translate[state.language].second}</small></div>
+                <div class="time-unit">
+                    <div class="tiles-wrapper">${formatToTiles()}${formatToTiles()}</div>
+                    <small>${translate[state.language].day}</small>
+                </div>
+                <div class="time-unit">
+                    <div class="tiles-wrapper">${formatToTiles()}${formatToTiles()}</div>
+                    <small>${translate[state.language].hour}</small>
+                </div>
+                <div class="time-unit">
+                    <div class="tiles-wrapper">${formatToTiles()}${formatToTiles()}</div>
+                    <small>${translate[state.language].minute}</small>
+                </div>
+                <div class="time-unit">
+                    <div class="tiles-wrapper">${formatToTiles()}${formatToTiles()}</div>
+                    <small>${translate[state.language].second}</small>
+                </div>
             `;
+
+            content.appendChild(eventDisplay);
+            content.appendChild(timeElement);
+            row.appendChild(del);
+            row.appendChild(content);
+            box.list.appendChild(row);
+        });
+    }
+
+    const rows = box.list.querySelectorAll(".item_row");
+    rows.forEach((row, index) => {
+        const item = state.items[index];
+        if (!item) return;
+
+        const time = calculateDays(item.date);
+        const strips = row.querySelectorAll(".digit-strip");
+
+        const timeStr =
+            String(time.days).padStart(2, '0') +
+            String(time.hours).padStart(2, '0') +
+            String(time.minutes).padStart(2, '0') +
+            String(time.seconds).padStart(2, '0');
+
+        for (let i = 0; i < 8; i++) {
+            if (strips[i]) {
+                const digit = parseInt(timeStr[i]);
+                strips[i].style.transform = `translateY(-${digit * 40}px)`;
+            }
         }
-
-        const bgColor = item.bgColor || "#ffffff";
-        const hex = bgColor.replace('#', '');
-        const r = parseInt(hex.substring(0, 2), 16) || 255;
-        const g = parseInt(hex.substring(2, 4), 16) || 255;
-        const b = parseInt(hex.substring(4, 6), 16) || 255;
-        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-        row.style.color = (brightness < 128) ? "white" : "#333";
-
-        eventDisplay.style.borderBottomColor = item.lineColor;
-        eventDisplay.style.color = "inherit";
-        content.appendChild(eventDisplay);
-        content.appendChild(timeElement);
-        row.appendChild(del);
-        row.appendChild(content);
-        row.appendChild(progress);
-        progress.appendChild(bar);
-        box.list.appendChild(row);
     });
 }
 
@@ -229,7 +246,7 @@ box.AddCountdownButton.addEventListener("click", function () {
     }
 
     const check = calculateDays(inputDate);
-    if (check.totalDiff < 0) {
+    if (check.totalDiff <= 0) {
         state.lastResult = "passed";
         box.result.style.color = "red";
         box.result.textContent = translate[state.language].passed;

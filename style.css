@@ -34,14 +34,10 @@ body {
 }
 
 #result {
-    width: 100%;
-    text-align: center;
-    margin-top: 10px;
-    font-size: 14px;
+    min-height: 0;
+    margin: 0;
     color: red;
-    min-height: 20px;
-    transition: (all, 0.3, ease);
-    transform: scale(1);
+    text-align: center;
 }
 
 #language_button {
@@ -139,6 +135,7 @@ input[type="date"] {
     top: 10px;
     right: 10px;
     transition: color 0.3s;
+    color: red;
 }
 
 .item_eventName {
@@ -152,11 +149,11 @@ input[type="date"] {
 }
 
 .timer_display {
-    display: flex;
-    flex-direction: row;
+    display: flex !important;
+    flex-direction: row !important;
     justify-content: center;
-    gap: 15px;
-    margin-top: 15px;
+    align-items: flex-end;
+    gap: 12px;
     width: 100%;
 }
 
@@ -164,14 +161,6 @@ input[type="date"] {
     display: flex !important;
     flex-direction: column;
     align-items: center;
-}
-
-.time-unit span {
-    font-size: 1.8rem;
-    font-weight: bold;
-    flex-direction: column;
-    color: inherit;
-    line-height: 1;
 }
 
 .time-unit small {
@@ -197,7 +186,51 @@ input[type="date"] {
     transition: width 1s linear;
 }
 
-.animate {
+/* .animate {
     transform: scale(1.1);
     color: #ff6b6b;
+} */
+
+
+.time-box {
+    text-align: center;
+}
+
+.tiles-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 40px;
+}
+
+.num {
+    height: 40px;
+    overflow: hidden;
+    position: relative;
+}
+
+.num div {
+    height: 40px;
+    line-height: 40px;
+    transition: transform 0.5s ease;
+}
+
+.digit-strip {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.5s ease;
+}
+
+.digit-tile {
+    width: 15px;
+    height: 40px;
+    overflow: hidden;
+    position: relative;
+}
+
+.digit-strip span {
+    height: 40px;
+    line-height: 40px;
+    display: block;
+    text-align: center;
 }
