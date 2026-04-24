@@ -106,17 +106,13 @@ function calculatePercent(startDate, endDate) {
     let end = new Date(endDate);
     let now = new Date();
 
-    if (now >= end) {
-        return 100;
-    }
-
-    if (now <= start) {
-        return 0;
-    }
+    if (now >= end) return 0;
+    if (now <= start) return 100;
 
     let total = end - start;
     let left = end - now;
-    let percent = left / total * 100;
+    let percent = (left / total) * 100;
+
     return percent.toFixed(2);
 }
 
@@ -127,6 +123,8 @@ function animateResult() {
 }
 
 function renderList() {
+    state.items.sort((a, b) => new Date(a.date) - new Date(b.date));
+
     if (box.list.children.length !== state.items.length) {
         box.list.innerHTML = "";
 
@@ -194,6 +192,13 @@ function renderList() {
         if (!item) return;
 
         const time = calculateDays(item.date);
+
+        if (time.days < 3 && time.totalDiff > 0) {
+            row.style.color = "rgb(215,25,25)";
+        } else {
+            row.style.color = "black";
+        }
+
         const strips = row.querySelectorAll(".digit-strip");
         const timeStr = String(time.days).padStart(2, '0') + String(time.hours).padStart(2, '0') +
             String(time.minutes).padStart(2, '0') + String(time.seconds).padStart(2, '0');
