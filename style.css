@@ -11,26 +11,26 @@ body {
     background-color: var(--light-grey);
     margin: 0;
     padding: 20px;
-    display: flex;
+    display: block;
     flex-direction: column;
-    align-items: center;
+    /* align-items: flex-start; */
 }
 
 .header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 0;
+    justify-content: flex-start;
+    gap: 15;
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
 }
 
 #title {
     font-size: 2.5rem;
-    margin: 0;
-    min-width: 450px;
-    text-align: right;
-    padding-right: 20px;
+    margin: 30px;
+    width: 540px;
+    text-align: center;
+    padding-right: 20px 0;
 }
 
 #result {
@@ -41,10 +41,11 @@ body {
 }
 
 #language_button {
-    min-width: 140px;
+    width: 150px;
     white-space: nowrap;
     flex-shrink: 0;
     text-align: center;
+    height: 40px;
 }
 
 
@@ -53,50 +54,9 @@ body {
     filter: brightness(0.9);
 }
 
-.input-container {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    gap: 20px;
-    margin-top: 5px;
-    margin: 0;
-    padding: 20px;
-    border-radius: 15px;
-}
-
-.input-group {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-
-.input-group p {
-    margin: 0 0 8px 0;
-    font-size: 14px;
-    white-space: nowrap;
-    line-height: 1;
-}
-
-input[type="color"] {
-    width: 80px;
-    height: 45px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    cursor: pointer;
-    background: none;
-    padding: 3;
-}
-
-input[type="text"],
-input[type="date"] {
-    min-width: 130px;
-    height: 20px;
-    padding: 10px 15px;
-    font-size: 16px;
-}
-
 #Start_button {
-    margin-left: 40px;
+    margin-left: 10px;
+    width: 150px;
     height: 45px;
     padding: 0 25px;
     background-color: var(--primary-pink);
@@ -112,18 +72,62 @@ input[type="date"] {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
-    justify-content: center;
-    max-width: 1200px;
+    justify-content: flex-start;
+    width: 650px;
     margin-top: 20px;
+}
+
+.input-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+    gap: 15px;
+    margin-top: 5px;
+    margin: 0;
+    padding: 5px 0 20px 0;
+    border-radius: 15px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.input-group p {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    white-space: nowrap;
+    line-height: 1;
+    min-width: 100px;
+    display: inline-block;
+}
+
+input[type="color"] {
+    width: 80px;
+    height: 45px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    background: none;
+    padding: 3;
+}
+
+input[type="text"],
+input[type="date"] {
+    width: 130px;
+    height: 20px;
+    padding: 10px 15px;
+    font-size: 16px;
 }
 
 .item_row {
     transition: background-color 0.3s ease;
-    border: 1px solid rgba(0, 0, 0, 0.05);
     padding: 20px;
     border-radius: 15px;
     border: none;
-    width: 320px;
+    width: calc(50% - 10px);
+    box-sizing: border-box;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -233,4 +237,83 @@ input[type="date"] {
     line-height: 40px;
     display: block;
     text-align: center;
+}
+
+.left-section {
+    flex: 0 1 auto;
+}
+
+/* 右側滾輪外殼 */
+.right-section {
+    top: 20px;
+    width: 300px;
+    padding-top: 85px;
+}
+
+.slot-machine {
+    background-color: #ffb11b;
+    border: 5px solid #000;
+    border-radius: 30px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 5px 5px 0px #000;
+}
+
+.slot-window {
+    height: 60px;
+    overflow: hidden;
+    background: #fff;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    position: relative;
+    border: 2px solid #333;
+}
+
+.slot-list {
+    transition: transform 3s cubic-bezier(0.1, 0, 0.1, 1);
+}
+
+@keyframes pop-effect {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.pop-animation {
+    animation: pop-effect 0.5s ease-out;
+    transition: color 0.3s;
+}
+
+.slot-list div {
+    height: 60px;
+    line-height: 60px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    transition: transform 0.2s ease;
+}
+
+#spin-button {
+    background: #333;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.main-layout {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 230px;
+    /* 調整左右兩側的間距 */
+    width: 100%;
 }

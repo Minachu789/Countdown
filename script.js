@@ -279,6 +279,52 @@ box.AddCountdownButton.addEventListener("click", function () {
     box.result.textContent = "";
 });
 
+const words = ["再接再厲！", "你做得到的！", "休息一下吧~", "今天也要加油!", "你是最棒的😊", "不要放棄💪", "你比想像中的自己更強大", "允許自己偶爾停下來休息"];
+const slotList = document.getElementById('slot-list');
+const spinButton = document.getElementById('spin-button');
+
+function initSlot() {
+    if (!slotList) return;
+    const content = words.map(q => `<div>${q}</div>`).join('');
+    slotList.innerHTML = new Array(10).fill(content).join('');
+}
+
+let isSpinning = false;
+
+spinButton.addEventListener('click', () => {
+    if (isSpinning) return;
+    isSpinning = true;
+
+    const itemHeight = 60;
+    const totalWords = words.length;
+    const randomIndex = Math.floor(Math.random() * totalWords);
+
+    slotList.style.transition = "transform 3s cubic-bezier(0.1, 0, 0.1, 1)";
+
+    const targetIndex = (totalWords * 4) + randomIndex;
+    const targetY = targetIndex * itemHeight;
+
+    slotList.style.transform = `translateY(-${targetY}px)`;
+
+    setTimeout(() => {
+        slotList.style.transition = "none";
+        slotList.style.transform = `translateY(-${randomIndex * itemHeight}px)`;
+
+        const allItems = slotList.querySelectorAll('div');
+        const targetItem = allItems[randomIndex]; 
+
+        if (targetItem) {
+            targetItem.classList.add("pop-animation");
+            
+            setTimeout(() => {
+                targetItem.classList.remove("pop-animation");
+            }, 500); 
+        }
+        isSpinning = false;
+    }, 3000);
+});
+
+initSlot();
 animateResult();
 changeLanguage();
 setInterval(renderList, 1000);
