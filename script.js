@@ -41,7 +41,9 @@ const translate = {
         hour: "Hours",
         second: "Seconds",
         bgColor: "Background color",
-        lineColor: "Line color"
+        lineColor: "Line color",
+        copySuccess:"Copied",
+        copyFail:"Copy Failed"
     },
     zh: {
         title: "Mina的倒數網站",
@@ -58,7 +60,10 @@ const translate = {
         hour: "小時",
         second: "秒",
         bgColor: "背景顏色",
-        lineColor: "線條顏色"
+        lineColor: "線條顏色",
+        share: "分享網站",
+        copySuccess:"已複製",
+        copyFail:"複製失敗"
     }
 };
 
@@ -75,6 +80,11 @@ function changeLanguage() {
     box.AddCountdownButton.textContent = translate[state.language].start;
     box.bgColorLabel.textContent = translate[state.language].bgColor;
     box.lineColorLabel.textContent = translate[state.language].lineColor;
+   
+    const shareBtn = document.querySelector("#share_website_button");
+    if (shareBtn) {
+        shareBtn.innerHTML = `<i class="fas fa-share-alt"></i> ${translate[state.language].shareWebsite}`;
+    }
 
     if (state.lastResult) {
         box.result.textContent = translate[state.language][state.lastResult];
@@ -279,6 +289,18 @@ box.AddCountdownButton.addEventListener("click", function () {
     box.result.textContent = "";
 });
 
+const websiteShareButton = document.getElementById('share_button');
+if (websiteShareButton) {
+    websiteShareButton.addEventListener('click', () => {
+        const websiteUrl = "https://minachu789.github.io/Countdown/";
+        navigator.clipboard.writeText(websiteUrl).then(() => {
+            alert(translate[state.language].copySuccess);
+        }).catch(err => {
+            alert(translate[state.language].copyFail);
+        });
+    });
+}
+
 const words = ["再接再厲！", "你做得到的！", "休息一下吧~", "今天也要加油!", "你是最棒的😊", "不要放棄💪", "你比想像中的自己更強大", "允許自己偶爾停下來休息"];
 const slotList = document.getElementById('slot-list');
 const spinButton = document.getElementById('spin-button');
@@ -311,14 +333,14 @@ spinButton.addEventListener('click', () => {
         slotList.style.transform = `translateY(-${randomIndex * itemHeight}px)`;
 
         const allItems = slotList.querySelectorAll('div');
-        const targetItem = allItems[randomIndex]; 
+        const targetItem = allItems[randomIndex];
 
         if (targetItem) {
             targetItem.classList.add("pop-animation");
-            
+
             setTimeout(() => {
                 targetItem.classList.remove("pop-animation");
-            }, 500); 
+            }, 500);
         }
         isSpinning = false;
     }, 3000);
