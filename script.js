@@ -23,7 +23,8 @@ const box = {
     lineColorPicker: document.querySelector("#lineColorPicker"),
     bgColorPicker: document.querySelector("#bgColorPicker"),
     lineColorLabel: document.querySelector("#lineColorLabel"),
-    bgColorLabel: document.querySelector("#bgColorLabel")
+    bgColorLabel: document.querySelector("#bgColorLabel"),
+    currentDate: document.querySelector("#currentDate")
 }
 
 const translate = {
@@ -45,7 +46,8 @@ const translate = {
         lineColor: "Line color",
         share: "Share Website",
         copySuccess: "Copied!",
-        copyFail: "Copy Failed"
+        copyFail: "Copy Failed",
+        today: "Today: "
     },
     zh: {
         title: "Mina的倒數網站",
@@ -65,7 +67,8 @@ const translate = {
         lineColor: "線條顏色",
         share: "分享網站",
         copySuccess: "已複製",
-        copyFail: "複製失敗"
+        copyFail: "複製失敗",
+        today: "今日日期: "
     }
 };
 
@@ -83,12 +86,10 @@ function changeLanguage() {
     box.bgColorLabel.textContent = translate[state.language].bgColor;
     box.lineColorLabel.textContent = translate[state.language].lineColor;
 
-    // 修正：修正變數名稱與 ID 綁定
     if (box.share) {
         box.share.innerHTML = `<i class="fas fa-share-alt"></i> ${translate[state.language].share}`;
     }
 
-    // 修正：避免空字串或無效 key 造成 undefined 顯示
     if (state.lastResult && translate[state.language][state.lastResult]) {
         box.result.textContent = translate[state.language][state.lastResult];
     } else {
@@ -96,6 +97,7 @@ function changeLanguage() {
     }
 
     renderList();
+    updateTodayDate();
 }
 
 function calculateDays(date) {
@@ -288,7 +290,7 @@ box.AddCountdownButton.addEventListener("click", function () {
         start: new Date().toISOString()
     });
 
-    state.lastResult = ""; 
+    state.lastResult = "";
     save();
     renderList();
 
@@ -316,6 +318,16 @@ function initSlot() {
     if (!slotList) return;
     const content = words.map(q => `<div>${q}</div>`).join('');
     slotList.innerHTML = new Array(10).fill(content).join('');
+}
+
+function updateTodayDate() {
+    if (!box.currentDate) return;
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+
+    box.currentDate.textContent = `${translate[state.language].today}${yyyy}/${mm}/${dd}`;
 }
 
 let isSpinning = false;
@@ -356,3 +368,4 @@ if (spinButton) {
 initSlot();
 changeLanguage();
 setInterval(renderList, 1000);
+setInterval(updateTodayDate, 1000);

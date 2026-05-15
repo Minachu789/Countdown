@@ -40,6 +40,10 @@ body {
     text-align: center;
 }
 
+#currentDate {
+    height: 40px;
+}
+
 #language_button {
     width: 150px;
     white-space: nowrap;
