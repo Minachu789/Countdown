@@ -11,6 +11,7 @@ const state = {
 
 const box = {
     title: document.querySelector("#title"),
+    share: document.querySelector("#share_button"),
     languageButton: document.querySelector("#language_button"),
     word: document.querySelector("#word"),
     input: document.querySelector("#dateInput"),
@@ -42,8 +43,9 @@ const translate = {
         second: "Seconds",
         bgColor: "Background color",
         lineColor: "Line color",
-        copySuccess:"Copied",
-        copyFail:"Copy Failed"
+        share: "Share Website",
+        copySuccess: "Copied!",
+        copyFail: "Copy Failed"
     },
     zh: {
         title: "Mina的倒數網站",
@@ -62,8 +64,8 @@ const translate = {
         bgColor: "背景顏色",
         lineColor: "線條顏色",
         share: "分享網站",
-        copySuccess:"已複製",
-        copyFail:"複製失敗"
+        copySuccess: "已複製",
+        copyFail: "複製失敗"
     }
 };
 
@@ -80,14 +82,17 @@ function changeLanguage() {
     box.AddCountdownButton.textContent = translate[state.language].start;
     box.bgColorLabel.textContent = translate[state.language].bgColor;
     box.lineColorLabel.textContent = translate[state.language].lineColor;
-   
-    const shareBtn = document.querySelector("#share_website_button");
-    if (shareBtn) {
-        shareBtn.innerHTML = `<i class="fas fa-share-alt"></i> ${translate[state.language].shareWebsite}`;
+
+    // 修正：修正變數名稱與 ID 綁定
+    if (box.share) {
+        box.share.innerHTML = `<i class="fas fa-share-alt"></i> ${translate[state.language].share}`;
     }
 
-    if (state.lastResult) {
+    // 修正：避免空字串或無效 key 造成 undefined 顯示
+    if (state.lastResult && translate[state.language][state.lastResult]) {
         box.result.textContent = translate[state.language][state.lastResult];
+    } else {
+        box.result.textContent = "";
     }
 
     renderList();
@@ -107,8 +112,6 @@ function calculateDays(date) {
         minutes: Math.floor((diffTime / (1000 * 60)) % 60),
         seconds: Math.floor((diffTime / 1000) % 60)
     };
-
-
 }
 
 function calculatePercent(startDate, endDate) {
@@ -128,7 +131,6 @@ function calculatePercent(startDate, endDate) {
 
 function animateResult() {
     box.result.classList.add("animate");
-
     setTimeout(() => { box.result.classList.remove("animate") }, 300);
 }
 
@@ -138,15 +140,24 @@ function renderList() {
     if (box.list.children.length !== state.items.length) {
         box.list.innerHTML = "";
 
-        const formatToTiles = () => `
-            <div class="digit-tile">
-                <div class="digit-strip">
-                    <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
-                    <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>
-                </div>
-            </div>`;
+        const formatToTiles = (count = 2) => {
+            let tilesHtml = '';
+            for (let i = 0; i < count; i++) {
+                tilesHtml += `
+                <div class="digit-tile">
+                    <div class="digit-strip">
+                        <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
+                        <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>
+                    </div>
+                </div>`;
+            }
+            return tilesHtml;
+        };
 
         state.items.forEach((item, index) => {
+            const time = calculateDays(item.date);
+            const dayDigits = Math.max(2, String(time.days).length);
+
             const row = document.createElement("div");
             row.classList.add("item_row");
             row.style.backgroundColor = item.bgColor;
@@ -171,10 +182,10 @@ function renderList() {
             const timeElement = document.createElement("div");
             timeElement.className = "timer_display";
             timeElement.innerHTML = `
-                <div class="time-unit"><div class="tiles-wrapper">${formatToTiles()}${formatToTiles()}</div><small>${translate[state.language].day}</small></div>
-                <div class="time-unit"><div class="tiles-wrapper">${formatToTiles()}${formatToTiles()}</div><small>${translate[state.language].hour}</small></div>
-                <div class="time-unit"><div class="tiles-wrapper">${formatToTiles()}${formatToTiles()}</div><small>${translate[state.language].minute}</small></div>
-                <div class="time-unit"><div class="tiles-wrapper">${formatToTiles()}${formatToTiles()}</div><small>${translate[state.language].second}</small></div>
+                <div class="time-unit"><div class="tiles-wrapper" data-unit="days">${formatToTiles(dayDigits)}</div><small>${translate[state.language].day}</small></div>
+                <div class="time-unit"><div class="tiles-wrapper" data-unit="hours">${formatToTiles(2)}</div><small>${translate[state.language].hour}</small></div>
+                <div class="time-unit"><div class="tiles-wrapper" data-unit="minutes">${formatToTiles(2)}</div><small>${translate[state.language].minute}</small></div>
+                <div class="time-unit"><div class="tiles-wrapper" data-unit="seconds">${formatToTiles(2)}</div><small>${translate[state.language].second}</small></div>
             `;
 
             const percentContainer = document.createElement("div");
@@ -182,8 +193,6 @@ function renderList() {
 
             const percentBar = document.createElement("div");
             percentBar.className = "percent-bar";
-
-            percentBar.style.backgroundImage = "none";
             percentBar.style.backgroundColor = item.lineColor;
 
             percentContainer.appendChild(percentBar);
@@ -209,22 +218,24 @@ function renderList() {
             row.style.color = "black";
         }
 
-        const strips = row.querySelectorAll(".digit-strip");
-        const timeStr = String(time.days).padStart(2, '0') + String(time.hours).padStart(2, '0') +
-            String(time.minutes).padStart(2, '0') + String(time.seconds).padStart(2, '0');
+        const timeUnits = ['days', 'hours', 'minutes', 'seconds'];
+        timeUnits.forEach(unit => {
+            const wrapper = row.querySelector(`.tiles-wrapper[data-unit="${unit}"]`);
+            if (!wrapper) return;
 
-        for (let i = 0; i < 8; i++) {
-            if (strips[i]) {
-                const digit = parseInt(timeStr[i]);
+            const strips = wrapper.querySelectorAll(".digit-strip");
+            const valStr = String(time[unit]).padStart(strips.length, '0');
+
+            for (let i = 0; i < strips.length; i++) {
+                const digit = parseInt(valStr[i]) || 0;
                 strips[i].style.transform = `translateY(-${digit * 40}px)`;
             }
-        }
+        });
 
         const percentBar = row.querySelector(".percent-bar");
         if (percentBar) {
             const progress = calculatePercent(item.start, item.date);
             percentBar.style.width = progress + "%";
-            percentBar.style.backgroundImage = "none";
             percentBar.style.backgroundColor = item.lineColor;
         }
     });
@@ -239,7 +250,6 @@ box.languageButton.addEventListener("click", function () {
 box.AddCountdownButton.addEventListener("click", function () {
     const inputDate = box.input.value;
     const eventName = box.eventName.value.trim();
-
     const lineColor = box.lineColorPicker.value;
     const bgColor = box.bgColorPicker.value;
 
@@ -249,14 +259,12 @@ box.AddCountdownButton.addEventListener("click", function () {
         box.result.textContent = translate[state.language].noDN;
         return;
     }
-
     if (!inputDate) {
         state.lastResult = "noDate";
         box.result.style.color = "red";
         box.result.textContent = translate[state.language].noDate;
         return;
     }
-
     if (!eventName) {
         state.lastResult = "noName";
         box.result.style.color = "red";
@@ -280,18 +288,17 @@ box.AddCountdownButton.addEventListener("click", function () {
         start: new Date().toISOString()
     });
 
+    state.lastResult = ""; 
     save();
     renderList();
 
-    // 清空輸入框
     box.eventName.value = "";
     box.input.value = "";
     box.result.textContent = "";
 });
 
-const websiteShareButton = document.getElementById('share_button');
-if (websiteShareButton) {
-    websiteShareButton.addEventListener('click', () => {
+if (box.share) {
+    box.share.addEventListener('click', () => {
         const websiteUrl = "https://minachu789.github.io/Countdown/";
         navigator.clipboard.writeText(websiteUrl).then(() => {
             alert(translate[state.language].copySuccess);
@@ -313,40 +320,39 @@ function initSlot() {
 
 let isSpinning = false;
 
-spinButton.addEventListener('click', () => {
-    if (isSpinning) return;
-    isSpinning = true;
+if (spinButton) {
+    spinButton.addEventListener('click', () => {
+        if (isSpinning) return;
+        isSpinning = true;
 
-    const itemHeight = 60;
-    const totalWords = words.length;
-    const randomIndex = Math.floor(Math.random() * totalWords);
+        const itemHeight = 60;
+        const totalWords = words.length;
+        const randomIndex = Math.floor(Math.random() * totalWords);
 
-    slotList.style.transition = "transform 3s cubic-bezier(0.1, 0, 0.1, 1)";
+        slotList.style.transition = "transform 3s cubic-bezier(0.1, 0, 0.1, 1)";
+        const targetIndex = (totalWords * 4) + randomIndex;
+        const targetY = targetIndex * itemHeight;
 
-    const targetIndex = (totalWords * 4) + randomIndex;
-    const targetY = targetIndex * itemHeight;
+        slotList.style.transform = `translateY(-${targetY}px)`;
 
-    slotList.style.transform = `translateY(-${targetY}px)`;
+        setTimeout(() => {
+            slotList.style.transition = "none";
+            slotList.style.transform = `translateY(-${randomIndex * itemHeight}px)`;
 
-    setTimeout(() => {
-        slotList.style.transition = "none";
-        slotList.style.transform = `translateY(-${randomIndex * itemHeight}px)`;
+            const allItems = slotList.querySelectorAll('div');
+            const targetItem = allItems[randomIndex];
 
-        const allItems = slotList.querySelectorAll('div');
-        const targetItem = allItems[randomIndex];
-
-        if (targetItem) {
-            targetItem.classList.add("pop-animation");
-
-            setTimeout(() => {
-                targetItem.classList.remove("pop-animation");
-            }, 500);
-        }
-        isSpinning = false;
-    }, 3000);
-});
+            if (targetItem) {
+                targetItem.classList.add("pop-animation");
+                setTimeout(() => {
+                    targetItem.classList.remove("pop-animation");
+                }, 500);
+            }
+            isSpinning = false;
+        }, 3000);
+    });
+}
 
 initSlot();
-animateResult();
 changeLanguage();
 setInterval(renderList, 1000);

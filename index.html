@@ -10,7 +10,6 @@
 
 <body>
     <div class="main-layout">
-
         <div class="left-section">
             <div class="header">
                 <h1 id="title">Mina's Countdown Website</h1>
@@ -23,18 +22,22 @@
                     <p id="eventLabel">Event Name</p>
                     <input type="text" id="eventName">
                 </div>
+
                 <div class="input-group">
                     <p id="word">Please choose a date</p>
-                    <input type="date" id="dateInput">
+                    <input type="date" id="dateInput" max="2099-12-31">
                 </div>
+
                 <div class="input-group">
                     <p id="bgColorLabel">BG Color</p>
                     <input type="color" id="bgColorPicker" value="#ffffff">
                 </div>
+
                 <div class="input-group">
                     <p id="lineColorLabel">Line Color</p>
                     <input type="color" id="lineColorPicker" value="#ffb6c1">
                 </div>
+
                 <button id="Start_button">Add Countdown</button>
             </div>
 
@@ -51,7 +54,6 @@
                 <button id="spin-button">spin</button>
             </div>
         </div>
-
     </div>
     <script src="script.js"></script>
 </body>

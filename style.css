@@ -20,7 +20,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: 15;
+    gap: 15px;
     width: 100%;
     margin-bottom: 5px;
 }
