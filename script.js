@@ -131,6 +131,20 @@ function calculatePercent(startDate, endDate) {
     return percent.toFixed(2);
 }
 
+function isDarkColor(hexColor) {
+    if (!hexColor) return false;
+
+    const hex = hexColor.replace('#', '');
+
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+
+    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+
+    return yiq < 128;
+}
+
 function animateResult() {
     box.result.classList.add("animate");
     setTimeout(() => { box.result.classList.remove("animate") }, 300);
@@ -214,10 +228,22 @@ function renderList() {
 
         const time = calculateDays(item.date);
 
-        if (time.days < 3 && time.totalDiff > 0) {
-            row.style.color = "rgb(215,25,25)";
+        const isDark = isDarkColor(item.bgColor);
+
+        if (isDark) {
+            row.style.color = "white";
+
+            const eventDisplay = row.querySelector(".item_eventName");
+            if (eventDisplay) eventDisplay.style.borderBottomColor = "white";
         } else {
-            row.style.color = "black";
+            if (time.days < 3 && time.totalDiff > 0) {
+                row.style.color = "rgb(215,25,25)";
+            } else {
+                row.style.color = "black";
+            }
+
+            const eventDisplay = row.querySelector(".item_eventName");
+            if (eventDisplay) eventDisplay.style.borderBottomColor = item.lineColor;
         }
 
         const timeUnits = ['days', 'hours', 'minutes', 'seconds'];
